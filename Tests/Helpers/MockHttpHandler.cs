@@ -1,0 +1,32 @@
+﻿using Moq;
+using Moq.Protected;
+using Newtonsoft.Json;
+
+namespace Tests.Helpers
+{
+    public class MockHttpHandler<T>
+    {
+        //Success
+        internal static Mock<HttpMessageHandler> SetupGetRequest(List<T> response)
+        {
+            var mockResponse = new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(response))
+            };
+
+            mockResponse.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            var mockHandler = new Mock<HttpMessageHandler>();
+            mockHandler.Protected().Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(mockResponse);
+
+            return mockHandler;
+        }
+
+        //NotFound
+    }
+}
