@@ -28,5 +28,26 @@ namespace Tests.Helpers
         }
 
         //NotFound
+        internal static Mock<HttpMessageHandler> SetupReturnNotFound()
+        {
+            var mockResponse = new HttpResponseMessage(System.Net.HttpStatusCode.NotFound)
+            {
+                Content = new StringContent("")
+            };
+
+            mockResponse.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            var mockHandler = new Mock<HttpMessageHandler>();
+            mockHandler.Protected().Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(mockResponse);
+
+            return mockHandler;
+
+
+        }
     }
 }
